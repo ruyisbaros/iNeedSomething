@@ -1,5 +1,3 @@
-import { CustomError, IErrorResponse } from './funcs/globalFuncs/helpers/error_handler';
-
 import { Application, json, urlencoded, Response, Request, NextFunction, application } from "express"
 import http from "http"
 import cors from "cors"
@@ -16,6 +14,7 @@ import { createAdapter } from "@socket.io/redis-adapter"
 import "express-async-errors"
 import { config } from "./config"
 import applicationRoutes from "./routes"
+import { CustomError, IErrorResponse } from './funcs/globalFuncs/helpers/error_handler';
 
 const PORT = config.PORT || 5000;
 const log:Logger=config.createLogs('serverSetUp');
