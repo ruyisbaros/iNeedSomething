@@ -1,4 +1,5 @@
 import dotenv from "dotenv"
+import bunyan from "bunyan"
 
 dotenv.config({})
 
@@ -29,6 +30,10 @@ class Config {
         this.CLOUD_API_KEY = process.env.CLOUD_API_KEY
         this.CLOUD_API_SECRET = process.env.CLOUD_API_SECRET
         this.REDIS_HOST = process.env.REDIS_HOST
+    }
+
+    public createLogs(name: string): bunyan {
+        return bunyan.createLogger({ name, level: 'debug' })
     }
 
     public validateConfig(): void {

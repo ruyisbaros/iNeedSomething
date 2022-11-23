@@ -1,14 +1,16 @@
 import mongoose from "mongoose";
 import { config } from "./config";
+import Logger from 'bunyan'
+const log: Logger = config.createLogs('DBSetUp');
 
 export default () => {
     const connect = () => {
         mongoose.connect(config.DB_URL!)
             .then(() => {
-                console.log("Db connection is done successufully!")
+                log.info("Db connection is done successufully!")
             })
             .catch((e) => {
-                console.log('Something went wrong during DB connection' + e.getMessage())
+                log.error('Something went wrong during DB connection' + e)
                 return process.exit(1)
             })
     }

@@ -1,3 +1,4 @@
+import { CustomError, IErrorResponse } from './funcs/globalFuncs/helpers/error_handler';
 
 import { Application, json, urlencoded, Response, Request, NextFunction, application } from "express"
 import http from "http"
@@ -5,6 +6,7 @@ import cors from "cors"
 import morgan from "morgan"
 import helmet from "helmet"
 import hpp from "hpp"
+import Logger from 'bunyan'
 import compression from 'compression'
 import cookieSession from "cookie-session"
 import httpStatusCodes from "http-status-codes"
@@ -16,6 +18,7 @@ import { config } from "./config"
 import applicationRoutes from "./routes"
 
 const PORT = config.PORT || 5000;
+const log:Logger=config.createLogs('serverSetUp');
 
 export class MyServer {
 
@@ -61,18 +64,29 @@ export class MyServer {
 
     private routesMiddleware(app: Application): void {
         applicationRoutes(app)
-     }
+    }
 
-    private exceptionHandler(app: Application): void { }
+    private exceptionHandler(app: Application): void {
+        app.all('*', (req: Request, res: Response) => {
+            res.status(httpStatusCodes.NOT_FOUND).json({ message: `${req.originalUrl} not found!` })
+        })
+
+        app.use((error: IErrorResponse, _req: Request, res: Response, next: NextFunction) => {
+            if (error instanceof CustomError) {
+                return res.status(error.statusCode).json(error.serializeError())
+            }
+            next()
+        })
+    }
 
     private async startServer(app: Application): Promise<void> {
         try {
             const httpServer: http.Server = new http.Server(app)
-            const socketIO:Server=await this.createSocketIO(httpServer)
+            const socketIO: Server = await this.createSocketIO(httpServer)
             this.startHttpServer(httpServer)
             this.socketIOConnections(socketIO)
         } catch (error) {
-            console.log(error)
+            log.error(error)
         }
     }
 
@@ -92,10 +106,10 @@ export class MyServer {
     }
 
     private startHttpServer(httpServer: http.Server): void {
-        console.log(`Server has started with process ${process.pid}`)
-        httpServer.listen(PORT, () => { console.log(`Server runs at ${PORT}...`) })
+        log.info(`Server has started with process ${process.pid}`)
+        httpServer.listen(PORT, () => { log.info(`Server runs at ${PORT}...`) })
     }
 
-    private socketIOConnections(io:Server): void {}
+    private socketIOConnections(io: Server): void { }
 
 }
