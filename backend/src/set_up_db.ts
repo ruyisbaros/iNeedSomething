@@ -8,11 +8,11 @@ export default () => {
                 console.log("Db connection is done successufully!")
             })
             .catch((e) => {
-                console.log('Something went wrong during DB connection'+e.getMessage())
+                console.log('Something went wrong during DB connection' + e.getMessage())
                 return process.exit(1)
             })
     }
     connect();
 
-    mongoose.connection.on('disconnected',connect)
+    mongoose.connection.on('disconnected', connect)
 }
